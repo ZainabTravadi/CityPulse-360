@@ -1,0 +1,236 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CityPulse 360° Smart City Platform Design System - Space-Inspired Theme */
+
+@layer base {
+  :root {
+    /* Deep space backgrounds */
+    --background: 220 15% 6%;
+    --foreground: 210 40% 98%;
+    --space-deep: 220 20% 4%;
+    --space-medium: 220 15% 8%;
+    --space-light: 220 12% 12%;
+
+    /* Cards and surfaces */
+    --card: 220 15% 8%;
+    --card-foreground: 210 40% 95%;
+    --card-border: 220 30% 15%;
+
+    /* Interactive elements */
+    --popover: 220 15% 10%;
+    --popover-foreground: 210 40% 95%;
+
+    /* Smart city accent colors - Blue & Gold Theme */
+    --primary: 220 80% 65%; /* Bright blue */
+    --primary-foreground: 210 40% 98%;
+    --primary-glow: 220 90% 75%;
+
+    --secondary: 200 70% 50%; /* Deep blue for accents */
+    --secondary-foreground: 210 40% 98%;
+    --secondary-glow: 200 80% 60%;
+
+    --success: 45 95% 60%; /* Golden yellow for success */
+    --success-foreground: 220 15% 8%;
+    --success-glow: 45 100% 70%;
+
+    --warning: 210 60% 45%; /* Medium blue for warnings */
+    --warning-foreground: 210 40% 98%;
+
+    --accent-gold: 45 85% 55%; /* Rich gold */
+    --accent-gold-foreground: 220 15% 8%;
+    --accent-gold-glow: 45 95% 65%;
+
+    /* Neutral tones */
+    --muted: 220 12% 15%;
+    --muted-foreground: 215 15% 65%;
+
+    --accent: 220 20% 20%;
+    --accent-foreground: 210 40% 95%;
+
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 210 40% 98%;
+
+    /* Interactive states */
+    --border: 220 20% 20%;
+    --input: 220 15% 12%;
+    --ring: 200 80% 60%;
+    --hover-glow: 200 100% 80%;
+
+    /* Design tokens */
+    --radius: 0.75rem;
+    --glow-intensity: 0.4;
+
+    /* Gradients - Blue & Gold Theme */
+    --gradient-space: linear-gradient(135deg, hsl(var(--space-deep)), hsl(var(--space-medium)));
+    --gradient-card: linear-gradient(145deg, hsl(var(--card) / 0.8), hsl(var(--space-light) / 0.6));
+    --gradient-glow: radial-gradient(circle at center, hsl(var(--primary-glow) / var(--glow-intensity)), transparent 70%);
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
+    --gradient-secondary: linear-gradient(135deg, hsl(var(--secondary)), hsl(var(--secondary-glow)));
+    --gradient-gold: linear-gradient(135deg, hsl(var(--accent-gold)), hsl(var(--accent-gold-glow)));
+    --gradient-blue-gold: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--accent-gold)));
+    --gradient-card-hover: linear-gradient(145deg, hsl(var(--primary) / 0.1), hsl(var(--accent-gold) / 0.1));
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-glow: box-shadow 0.3s ease-in-out;
+
+    /* Shadows with glow effects */
+    --shadow-card: 0 4px 20px -4px hsl(var(--space-deep) / 0.8);
+    --shadow-glow: 0 0 20px hsl(var(--primary-glow) / 0.3);
+    --shadow-hover: 0 8px 40px -8px hsl(var(--hover-glow) / 0.4);
+
+    /* Typography scale */
+    --font-heading: 'Inter', system-ui, sans-serif;
+    --font-body: 'Inter', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    --sidebar-background: 0 0% 98%;
+
+    --sidebar-foreground: 240 5.3% 26.1%;
+
+    --sidebar-primary: 240 5.9% 10%;
+
+    --sidebar-primary-foreground: 0 0% 98%;
+
+    --sidebar-accent: 240 4.8% 95.9%;
+
+    --sidebar-accent-foreground: 240 5.9% 10%;
+
+    --sidebar-border: 220 13% 91%;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body;
+    background: var(--gradient-space);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--space-deep));
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary));
+    border-radius: 3px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary-glow));
+  }
+
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  /* Glow effects */
+  .glow-primary {
+    box-shadow: 0 0 20px hsl(var(--primary-glow) / 0.4);
+  }
+  
+  .glow-secondary {
+    box-shadow: 0 0 20px hsl(var(--secondary-glow) / 0.4);
+  }
+  
+  .glow-success {
+    box-shadow: 0 0 20px hsl(var(--success-glow) / 0.4);
+  }
+
+  /* Card variants */
+  .card-space {
+    background: var(--gradient-card);
+    border: 1px solid hsl(var(--card-border));
+    backdrop-filter: blur(20px);
+    box-shadow: var(--shadow-card);
+    transition: var(--transition-smooth);
+  }
+  
+  .card-space:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-2px);
+  }
+
+  /* Interactive elements */
+  .interactive-glow {
+    transition: var(--transition-glow);
+  }
+  
+  .interactive-glow:hover {
+    box-shadow: 0 0 30px hsl(var(--hover-glow) / 0.5);
+  }
+
+  /* Animated background effects */
+  .starfield {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: -1;
+    opacity: 0.6;
+  }
+
+  .city-lights {
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(2px 2px at 20px 30px, hsl(var(--secondary-glow)), transparent),
+      radial-gradient(2px 2px at 40px 70px, hsl(var(--success-glow)), transparent),
+      radial-gradient(1px 1px at 90px 40px, hsl(var(--primary-glow)), transparent),
+      radial-gradient(1px 1px at 130px 80px, hsl(var(--warning)), transparent),
+      radial-gradient(2px 2px at 160px 30px, hsl(var(--secondary-glow)), transparent);
+    background-repeat: repeat;
+    background-size: 200px 100px;
+    animation: twinkle 4s ease-in-out infinite alternate;
+  }
+
+  @keyframes twinkle {
+    0% { opacity: 0.3; }
+    50% { opacity: 0.8; }
+    100% { opacity: 0.3; }
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { 
+      box-shadow: 0 0 20px hsl(var(--primary-glow) / 0.4);
+    }
+    50% { 
+      box-shadow: 0 0 40px hsl(var(--primary-glow) / 0.8);
+    }
+  }
+
+  .pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  /* Typography styles */
+  .heading-glow {
+    font-family: var(--font-heading);
+    font-weight: 700;
+    text-shadow: 0 0 20px hsl(var(--primary-glow) / 0.5);
+  }
+
+  .text-glow {
+    text-shadow: 0 0 10px currentColor;
+  }
+}
