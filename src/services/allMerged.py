@@ -5,12 +5,16 @@ import random
 from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 
-# Import db + models
+# Import routes + db models
+from src.routes.forecast import forecast_bp
 from src.model.models import db, TrafficData, ElectricityData, WaterData, ComplaintData, AirQualityData
 
 # ----------------- Init Flask -----------------
 app = Flask(__name__)
 CORS(app)
+
+# Register Blueprints
+app.register_blueprint(forecast_bp)
 
 # ----------------- DB Config -----------------
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///citypulse.db"
@@ -37,10 +41,12 @@ SAMPLE_COMPLAINTS = [
 
 # ----------------- Helper functions -----------------
 def fetch_traffic():
-    lat, lon = 28.6139, 77.2090  # New Delhi
-    url = f"https://api.tomtom.com/traffic/services/4/flowSegmentData/relative0/10/json?key={TRAFFIC_API_KEY}&point={lat},{lon}"
-    response = requests.get(url)
-    if response.status_code == 200:
+    try:
+        lat, lon = 28.6139, 77.2090  # New Delhi
+        url = f"https://api.tomtom.com/traffic/services/4/flowSegmentData/relative0/10/json?key={TRAFFIC_API_KEY}&point={lat},{lon}"
+        response = requests.get(url, timeout=10)
+        response.raise_for_status()
+
         data = response.json()
         congestion = data["flowSegmentData"]["currentTravelTime"] / data["flowSegmentData"]["freeFlowTravelTime"]
         congestion_percent = round(congestion * 100, 2)
@@ -50,14 +56,18 @@ def fetch_traffic():
         db.session.commit()
 
         return {"congestion": f"{congestion_percent}%"}
-    return None
+    except Exception as e:
+        print("Traffic API error:", e)
+        return None
 
 
 def fetch_electricity():
-    zone = "IN-WE"
-    headers = {"auth-token": ELECTRICITY_API_KEY}
-    r = requests.get(f"{ELECTRICITY_URL}?zone={zone}", headers=headers)
-    if r.status_code == 200:
+    try:
+        zone = "IN-WE"
+        headers = {"auth-token": ELECTRICITY_API_KEY}
+        r = requests.get(f"{ELECTRICITY_URL}?zone={zone}", headers=headers, timeout=10)
+        r.raise_for_status()
+
         data = r.json()
         total_load = data["powerConsumptionTotal"]
 
@@ -66,13 +76,17 @@ def fetch_electricity():
         db.session.commit()
 
         return {"zone": zone, "electricity_load": f"{total_load} MW"}
-    return None
+    except Exception as e:
+        print("Electricity API error:", e)
+        return None
 
 
 def fetch_air(lat=28.6139, lon=77.2090):
-    url = f"http://api.openweathermap.org/data/2.5/air_pollution?lat={lat}&lon={lon}&appid={OWM_KEY}"
-    r = requests.get(url)
-    if r.status_code == 200:
+    try:
+        url = f"http://api.openweathermap.org/data/2.5/air_pollution?lat={lat}&lon={lon}&appid={OWM_KEY}"
+        r = requests.get(url, timeout=10)
+        r.raise_for_status()
+
         data = r.json()
         aqi = data["list"][0]["main"]["aqi"]
         aqi_labels = {1: "Good 🌿", 2: "Fair 🙂", 3: "Moderate 😐", 4: "Poor 😷", 5: "Very Poor ☠️"}
@@ -82,7 +96,9 @@ def fetch_air(lat=28.6139, lon=77.2090):
         db.session.commit()
 
         return {"aqi": aqi, "description": aqi_labels.get(aqi, "Unknown")}
-    return None
+    except Exception as e:
+        print("Air Quality API error:", e)
+        return None
 
 
 def fetch_water():
@@ -102,7 +118,7 @@ def fetch_water():
 
 def fetch_complaints():
     complaints = []
-    for i in range(5):  # save 5 at a time
+    for _ in range(5):  # save 5 at a time
         category = random.choice(CATEGORIES)
         description = random.choice(SAMPLE_COMPLAINTS)
         status = random.choice(["Open", "In Progress", "Resolved"])
@@ -152,14 +168,16 @@ def get_air_quality():
 
 
 # ----------------- Scheduler -----------------
+scheduler = BackgroundScheduler()
+
 def start_scheduler():
-    scheduler = BackgroundScheduler()
-    scheduler.add_job(func=fetch_traffic, trigger="interval", minutes=5)
-    scheduler.add_job(func=fetch_electricity, trigger="interval", minutes=5)
-    scheduler.add_job(func=fetch_air, trigger="interval", minutes=10)
-    scheduler.add_job(func=fetch_water, trigger="interval", minutes=3)
-    scheduler.add_job(func=fetch_complaints, trigger="interval", minutes=7)
-    scheduler.start()
+    if not scheduler.running:  # Prevent double start in debug mode
+        scheduler.add_job(func=fetch_traffic, trigger="interval", minutes=5)
+        scheduler.add_job(func=fetch_electricity, trigger="interval", minutes=5)
+        scheduler.add_job(func=fetch_air, trigger="interval", minutes=10)
+        scheduler.add_job(func=fetch_water, trigger="interval", minutes=3)
+        scheduler.add_job(func=fetch_complaints, trigger="interval", minutes=7)
+        scheduler.start()
 
 
 # ----------------- Run App -----------------
