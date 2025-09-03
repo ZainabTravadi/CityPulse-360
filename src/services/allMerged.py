@@ -5,16 +5,13 @@ import random
 from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
 
-# Import routes + db models
-from src.routes.forecast import forecast_bp
+# Import db + forecasting
 from src.model.models import db, TrafficData, ElectricityData, WaterData, ComplaintData, AirQualityData
+from src.services.forecasting_service import build_forecast, generate_synthetic_data
 
 # ----------------- Init Flask -----------------
 app = Flask(__name__)
 CORS(app)
-
-# Register Blueprints
-app.register_blueprint(forecast_bp)
 
 # ----------------- DB Config -----------------
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///citypulse.db"
@@ -138,7 +135,6 @@ def fetch_complaints():
     db.session.commit()
     return {"count": len(complaints), "complaints": complaints}
 
-
 # ----------------- Flask Endpoints -----------------
 @app.route("/traffic", methods=["GET"])
 def get_traffic():
@@ -148,6 +144,24 @@ def get_traffic():
 @app.route("/electricity", methods=["GET"])
 def get_electricity_load():
     return jsonify(fetch_electricity())
+
+
+@app.route("/electricity/forecast", methods=["GET"])
+def get_forecast():
+    df = generate_synthetic_data(hours=24*60)
+    forecast, stats = build_forecast(df)
+    return jsonify({
+        "forecast": forecast,
+        "stats": stats,
+        "feature_importance": [
+            {"feature": "Historical Patterns", "importance": 0.85},
+            {"feature": "Weather Conditions", "importance": 0.72},
+            {"feature": "Population Density", "importance": 0.68},
+            {"feature": "Time of Day", "importance": 0.64},
+            {"feature": "Special Events", "importance": 0.45},
+            {"feature": "Economic Indicators", "importance": 0.32},
+        ]
+    })
 
 
 @app.route("/water", methods=["GET"])
@@ -166,7 +180,6 @@ def get_air_quality():
     lon = request.args.get("lon", 77.2090)
     return jsonify(fetch_air(lat, lon))
 
-
 # ----------------- Scheduler -----------------
 scheduler = BackgroundScheduler()
 
@@ -178,7 +191,6 @@ def start_scheduler():
         scheduler.add_job(func=fetch_water, trigger="interval", minutes=3)
         scheduler.add_job(func=fetch_complaints, trigger="interval", minutes=7)
         scheduler.start()
-
 
 # ----------------- Run App -----------------
 if __name__ == "__main__":
