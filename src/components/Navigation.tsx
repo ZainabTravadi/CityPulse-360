@@ -7,16 +7,17 @@ import cityPulseLogo from "@/assets/citypulse-logo.png";
 interface NavigationProps {
   activeSection: string;
   onNavigate: (section: string) => void;
+  onRefresh: () => void;
 }
 
-const Navigation = ({ activeSection, onNavigate }: NavigationProps) => {
+
+const Navigation = ({ activeSection, onNavigate, onRefresh }: NavigationProps) => {
   const navItems = [
     { id: 'dashboard', label: 'Dashboard' },
     { id: 'analytics', label: 'Predictive Analytics' },
     { id: 'zones', label: 'Zones' },
     { id: 'sentiment', label: 'Sentiment' },
-    { id: 'alerts', label: 'Alerts' },
-    { id: 'reports', label: 'Reports' }
+    { id: 'alerts', label: 'Alerts' }
   ];
 
   return (
@@ -62,6 +63,7 @@ const Navigation = ({ activeSection, onNavigate }: NavigationProps) => {
               variant="outline"
               size="sm"
               className="border-card-border bg-space-medium/50 hover:bg-space-light"
+              onClick={onRefresh}
             >
               <RefreshCw className="w-4 h-4 mr-2" />
               Refresh

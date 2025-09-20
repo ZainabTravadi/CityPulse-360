@@ -1,24 +1,68 @@
-# Logs
-logs
+# -----------------
+# Python
+# -----------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+*.egg
 *.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# -----------------
+# Virtual environments
+# -----------------
+env/
+venv/
+ENV/
+.venv/
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+# -----------------
+# Flask / SQLite DB
+# -----------------
+instance/
+*.db
+*.sqlite3
+
+# -----------------
+# Environment / Secrets
+# -----------------
+.env
+*.secret
+secrets.json
+config.json
+
+# -----------------
+# Data files
+# -----------------
+feedback_synthetic.csv
+*.csv
+*.tsv
+*.parquet
+*.h5
+*.hdf5
+*.pkl
+
+# -----------------
+# OS / IDE files
+# -----------------
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# -----------------
+# Logs
+# -----------------
+logs/
+*.log
+
+# -----------------
+# Caches
+# -----------------
+.cache/
+*.bak
+*.tmp

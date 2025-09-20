@@ -5,7 +5,6 @@ import Analytics from "@/components/Analytics";
 import ZonesClustering from "@/components/ZonesClustering";
 import SentimentAnalysis from "@/components/SentimentAnalysis";
 import AlertsNotifications from "@/components/AlertsNotifications";
-import Reports from "@/components/Reports";
 import BackgroundEffects from "@/components/BackgroundEffects";
 
 const CityPulseDashboard = () => {
@@ -18,10 +17,11 @@ const CityPulseDashboard = () => {
       element.scrollIntoView({ behavior: 'smooth' });
     }
   };
+  const handleRefresh = () => window.location.reload();
 
   useEffect(() => {
     const handleScroll = () => {
-      const sections = ['dashboard', 'analytics', 'zones', 'sentiment', 'alerts', 'reports'];
+      const sections = ['dashboard', 'analytics', 'zones', 'sentiment', 'alerts'];
       const scrollPosition = window.scrollY + 200;
 
       for (const section of sections) {
@@ -43,7 +43,8 @@ const CityPulseDashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-space text-foreground">
       <BackgroundEffects />
-      <Navigation activeSection={activeSection} onNavigate={handleNavigate} />
+      <Navigation 
+      activeSection={activeSection} onNavigate={handleNavigate} onRefresh={handleRefresh} />
       
       <main>
         <Dashboard />
@@ -51,7 +52,6 @@ const CityPulseDashboard = () => {
         <ZonesClustering />
         <SentimentAnalysis />
         <AlertsNotifications />
-        <Reports />
       </main>
     </div>
   );

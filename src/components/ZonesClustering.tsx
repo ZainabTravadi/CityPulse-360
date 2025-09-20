@@ -1,4 +1,6 @@
-import { useState } from "react";
+"use client";
+
+import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,128 +11,57 @@ import {
   Droplets,
   MessageSquare,
   X,
-  TrendingUp,
-  AlertCircle,
+  Activity,
   CheckCircle2,
-  Activity
+  AlertTriangle,
 } from "lucide-react";
 
 const ZonesClustering = () => {
+  const [zones, setZones] = useState<any[]>([]);
   const [selectedZone, setSelectedZone] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const zones = [
-    {
-      id: 1,
-      name: "Downtown District",
-      priority: "high",
-      color: "destructive",
-      position: { top: "35%", left: "45%" },
-      aqi: 78,
-      complaints: 12,
-      waterUsage: 89,
-      recommendations: [
-        "Deploy additional traffic controllers",
-        "Increase air quality monitoring",
-        "Schedule maintenance for water systems"
-      ]
-    },
-    {
-      id: 2,
-      name: "Residential Area B",
-      priority: "normal",
-      color: "primary",
-      position: { top: "60%", left: "30%" },
-      aqi: 45,
-      complaints: 3,
-      waterUsage: 67,
-      recommendations: [
-        "Regular maintenance checks",
-        "Community engagement programs"
-      ]
-    },
-    {
-      id: 3,
-      name: "Eco Park Zone",
-      priority: "eco",
-      color: "success",
-      position: { top: "25%", left: "70%" },
-      aqi: 22,
-      complaints: 1,
-      waterUsage: 34,
-      recommendations: [
-        "Expand green initiatives",
-        "Install additional sensors"
-      ]
-    },
-    {
-      id: 4,
-      name: "Industrial District",
-      priority: "high",
-      color: "destructive",
-      position: { top: "70%", left: "55%" },
-      aqi: 92,
-      complaints: 18,
-      waterUsage: 156,
-      recommendations: [
-        "Immediate emission control measures",
-        "Schedule industrial equipment inspection",
-        "Increase water conservation protocols"
-      ]
-    },
-    {
-      id: 5,
-      name: "Commercial Hub",
-      priority: "normal",
-      color: "warning",
-      position: { top: "45%", left: "25%" },
-      aqi: 58,
-      complaints: 7,
-      waterUsage: 78,
-      recommendations: [
-        "Monitor peak hour traffic",
-        "Optimize waste collection routes"
-      ]
-    }
-  ];
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:5000";
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high': return 'bg-destructive/80 border-destructive';
-      case 'eco': return 'bg-success/80 border-success';
-      default: return 'bg-primary/80 border-primary';
-    }
-  };
+  useEffect(() => {
+    const fetchZoneData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await fetch(`${API_BASE}/zones`);
+        if (!response.ok) throw new Error(`Failed to fetch: ${response.status}`);
+        const allZones = await response.json();
+        setZones(allZones);
+      } catch (err: any) {
+        console.error(err);
+        setError("Could not load zone data. Ensure backend is running.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchZoneData();
+  }, [API_BASE]);
+
+  const getPriorityColor = (priority: string) =>
+    priority === "high" ? "bg-destructive/80 border-destructive" :
+    priority === "eco" ? "bg-success/80 border-success" : "bg-primary/80 border-primary";
 
   const getStatusColor = (value: number, type: string) => {
-    if (type === 'aqi') {
-      if (value > 80) return 'text-destructive';
-      if (value > 50) return 'text-warning';
-      return 'text-success';
-    }
-    if (type === 'complaints') {
-      if (value > 10) return 'text-destructive';
-      if (value > 5) return 'text-warning';
-      return 'text-success';
-    }
-    if (type === 'water') {
-      if (value > 100) return 'text-destructive';
-      if (value > 75) return 'text-warning';
-      return 'text-success';
-    }
-    return 'text-foreground';
+    if (type === "aqi") return value >= 4 ? "text-destructive" : value === 3 ? "text-warning" : "text-success";
+    if (type === "complaints") return value > 10 ? "text-destructive" : value > 5 ? "text-warning" : "text-success";
+    if (type === "water") return value > 100 ? "text-destructive" : value > 75 ? "text-warning" : "text-success";
+    return "text-foreground";
   };
 
   return (
     <section id="zones" className="min-h-screen pt-24 pb-16">
       <div className="max-w-7xl mx-auto px-6">
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-heading font-bold text-foreground heading-glow mb-2">
             Zones & Clustering
           </h1>
-          <p className="text-muted-foreground">
-            Interactive zone management with AI-powered insights
-          </p>
+          <p className="text-muted-foreground">Interactive zone management with insights</p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-[700px]">
@@ -157,23 +88,30 @@ const ZonesClustering = () => {
                 </div>
               </div>
 
-              {/* Map Background */}
               <div className="relative w-full h-[600px] bg-gradient-to-br from-space-deep to-space-medium rounded-lg border border-card-border overflow-hidden">
                 <div className="absolute inset-0 city-lights opacity-20"></div>
-                
-                {/* Zone Markers */}
-                {zones.map((zone) => (
+
+                {loading && (
+                  <div className="absolute inset-0 flex items-center justify-center text-muted-foreground">
+                    Loading zones...
+                  </div>
+                )}
+
+                {error && !loading && (
+                  <div className="absolute inset-0 flex flex-col items-center justify-center text-destructive">
+                    <AlertTriangle className="w-10 h-10 mb-2" />
+                    <span>{error}</span>
+                  </div>
+                )}
+
+                {!loading && !error && zones.map((zone) => (
                   <div
                     key={zone.id}
-                    className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer group"
+                    className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer group z-10"
                     style={{ top: zone.position.top, left: zone.position.left }}
                     onClick={() => setSelectedZone(zone)}
                   >
-                    <div className={`
-                      w-6 h-6 rounded-full ${getPriorityColor(zone.priority)} 
-                      flex items-center justify-center transition-all duration-300 
-                      group-hover:scale-125 group-hover:shadow-lg pulse-glow
-                    `}>
+                    <div className={`w-6 h-6 rounded-full ${getPriorityColor(zone.priority)} flex items-center justify-center transition-all duration-300 group-hover:scale-125 group-hover:shadow-lg pulse-glow`}>
                       <div className="w-2 h-2 bg-white rounded-full"></div>
                     </div>
                     <div className="absolute top-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
@@ -185,7 +123,7 @@ const ZonesClustering = () => {
                 ))}
 
                 {/* Grid overlay */}
-                <div className="absolute inset-0 opacity-10">
+                <div className="absolute inset-0 opacity-10 pointer-events-none">
                   <svg width="100%" height="100%">
                     <defs>
                       <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
@@ -195,28 +133,88 @@ const ZonesClustering = () => {
                     <rect width="100%" height="100%" fill="url(#grid)" />
                   </svg>
                 </div>
+
+                {/* Floating Card */}
+                {selectedZone && (
+                  <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 w-96 z-50">
+                    <Card className="p-6 shadow-xl border border-border bg-background/95 backdrop-blur-md">
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-heading font-semibold text-foreground">
+                          {selectedZone.name}
+                        </h3>
+                        <Button variant="ghost" size="sm" onClick={() => setSelectedZone(null)}>
+                          <X className="w-4 h-4" />
+                        </Button>
+                      </div>
+
+                      <Badge className={`${getPriorityColor(selectedZone.priority)} text-white mb-4`}>
+                        {selectedZone.priority.toUpperCase()} PRIORITY
+                      </Badge>
+
+                      <div className="space-y-3 text-sm mb-4">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <Wind className="w-4 h-4 text-muted-foreground" />
+                            <span>Air Quality Index</span>
+                          </div>
+                          <span className={`font-semibold ${getStatusColor(selectedZone.aqi, "aqi")}`}>
+                            {["Good", "Fair", "Moderate", "Poor", "Very Poor"][selectedZone.aqi - 1] || 'Unknown'} ({selectedZone.aqi})
+                          </span>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <MessageSquare className="w-4 h-4 text-muted-foreground" />
+                            <span>Active Complaints</span>
+                          </div>
+                          <span className={`font-semibold ${getStatusColor(selectedZone.complaints, "complaints")}`}>
+                            {selectedZone.complaints}
+                          </span>
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-2">
+                            <Droplets className="w-4 h-4 text-muted-foreground" />
+                            <span>Water Usage %</span>
+                          </div>
+                          <span className={`font-semibold ${getStatusColor(selectedZone.waterUsage, "water")}`}>
+                            {selectedZone.waterUsage}%
+                          </span>
+                        </div>
+                      </div>
+
+                      <div>
+                        <div className="flex items-center space-x-2 mb-2">
+                          <Activity className="w-4 h-4 text-primary" />
+                          <h4 className="font-medium text-foreground">AI Recommendations</h4>
+                        </div>
+                        <div className="space-y-1">
+                          {selectedZone.recommendations.map((rec: string, idx: number) => (
+                            <div key={idx} className="flex items-start space-x-2 text-sm text-muted-foreground">
+                              <CheckCircle2 className="w-3 h-3 mt-0.5 text-success" />
+                              <span>{rec}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </Card>
+                  </div>
+                )}
               </div>
             </Card>
           </div>
 
-          {/* Zone Details Panel */}
+          {/* Side Panel */}
           <div className="lg:col-span-1">
             <Card className="card-space p-6 h-full">
               {selectedZone ? (
                 <>
                   <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-lg font-heading font-semibold text-foreground">
-                      Zone Details
-                    </h3>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setSelectedZone(null)}
-                    >
+                    <h3 className="text-lg font-heading font-semibold text-foreground">Zone Details</h3>
+                    <Button variant="ghost" size="sm" onClick={() => setSelectedZone(null)}>
                       <X className="w-4 h-4" />
                     </Button>
                   </div>
-
                   <div className="space-y-6">
                     <div>
                       <h4 className="font-medium text-foreground mb-2">{selectedZone.name}</h4>
@@ -224,45 +222,37 @@ const ZonesClustering = () => {
                         {selectedZone.priority.toUpperCase()} PRIORITY
                       </Badge>
                     </div>
-
                     <Separator />
-
-                    {/* Metrics */}
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
                           <Wind className="w-4 h-4 text-muted-foreground" />
                           <span className="text-sm text-muted-foreground">Air Quality Index</span>
                         </div>
-                        <span className={`font-semibold ${getStatusColor(selectedZone.aqi, 'aqi')}`}>
-                          {selectedZone.aqi}
+                        <span className={`font-semibold ${getStatusColor(selectedZone.aqi, "aqi")}`}>
+                          {["Good", "Fair", "Moderate", "Poor", "Very Poor"][selectedZone.aqi - 1] || 'Unknown'} ({selectedZone.aqi})
                         </span>
                       </div>
-
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
                           <MessageSquare className="w-4 h-4 text-muted-foreground" />
                           <span className="text-sm text-muted-foreground">Active Complaints</span>
                         </div>
-                        <span className={`font-semibold ${getStatusColor(selectedZone.complaints, 'complaints')}`}>
+                        <span className={`font-semibold ${getStatusColor(selectedZone.complaints, "complaints")}`}>
                           {selectedZone.complaints}
                         </span>
                       </div>
-
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
                           <Droplets className="w-4 h-4 text-muted-foreground" />
                           <span className="text-sm text-muted-foreground">Water Usage %</span>
                         </div>
-                        <span className={`font-semibold ${getStatusColor(selectedZone.waterUsage, 'water')}`}>
+                        <span className={`font-semibold ${getStatusColor(selectedZone.waterUsage, "water")}`}>
                           {selectedZone.waterUsage}%
                         </span>
                       </div>
                     </div>
-
                     <Separator />
-
-                    {/* AI Recommendations */}
                     <div>
                       <div className="flex items-center space-x-2 mb-3">
                         <Activity className="w-4 h-4 text-primary" />
@@ -282,12 +272,8 @@ const ZonesClustering = () => {
               ) : (
                 <div className="flex flex-col items-center justify-center h-full text-center">
                   <MapPin className="w-12 h-12 text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-heading font-semibold text-foreground mb-2">
-                    Select a Zone
-                  </h3>
-                  <p className="text-muted-foreground text-sm">
-                    Click on any zone marker to view detailed metrics and AI recommendations
-                  </p>
+                  <h3 className="text-lg font-heading font-semibold text-foreground mb-2">Select a Zone</h3>
+                  <p className="text-muted-foreground text-sm">Click on any zone marker to view detailed metrics and AI recommendations</p>
                 </div>
               )}
             </Card>
