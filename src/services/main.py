@@ -18,7 +18,7 @@ from src.model.models import db, Zone, TrafficData, ElectricityData, WaterData, 
 from src.services.forecasting_service import build_forecast, generate_synthetic_data
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-REACT_BUILD_DIR = os.path.join(BASE_DIR, "..", "build")
+REACT_BUILD_DIR = os.path.join(BASE_DIR, "dist")
 
 app = Flask(__name__, static_folder=REACT_BUILD_DIR, static_url_path="/")
 CORS(app)
@@ -333,17 +333,6 @@ def check_for_alerts():
 def health():
     return {"status": "ok", "message": "CityPulse API is live 🚀"} 
 
-@app.route("/", defaults={"path": ""})
-@app.route("/<path:path>")
-def serve_react(path):
-    """
-    Serve React build files from /build directory.
-    """
-    if path != "" and os.path.exists(os.path.join(REACT_BUILD_DIR, path)):
-        return send_from_directory(REACT_BUILD_DIR, path)
-    else:
-        return send_from_directory(REACT_BUILD_DIR, "index.html")
-
 # -- System endpoints (traffic, electricity, water, air, complaints) --
 @app.route("/traffic", methods=["GET"])
 def get_traffic():
@@ -634,6 +623,17 @@ def resolve_alert(alert_id):
             "estimatedResolution": "Completed" # Update resolution text
         }
         return jsonify(updated_alert)
+    
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
+def serve_react(path):
+    """
+    Serve React build files from /build directory.
+    """
+    if path != "" and os.path.exists(os.path.join(REACT_BUILD_DIR, path)):
+        return send_from_directory(REACT_BUILD_DIR, path)
+    else:
+        return send_from_directory(REACT_BUILD_DIR, "index.html")
 
 # ----------------- App start -----------------
 if __name__ == "__main__":
