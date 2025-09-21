@@ -20,9 +20,12 @@ from src.services.forecasting_service import build_forecast, generate_synthetic_
 app = Flask(__name__)
 CORS(app)
 
-# In app.py
+db_url = os.getenv("DATABASE_URL", "sqlite:///citypulse.db")
+# SQLAlchemy/psycopg2 expects 'postgresql://' not 'postgres://'
+if db_url.startswith("postgres://"):
+    db_url = db_url.replace("postgres://", "postgresql://", 1)
 
-app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL", "sqlite:///citypulse.db")
+app.config["SQLALCHEMY_DATABASE_URI"] = db_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
