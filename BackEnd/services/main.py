@@ -15,7 +15,7 @@ load_dotenv()
 
 # ----------------- Init Flask & DB -----------------
 from model.models import db, Zone, TrafficData, ElectricityData, WaterData, ComplaintData, AirQualityData, Alert
-from services.forecasting_service import build_forecast, generate_synthetic_data
+from forecasting_service import build_forecast, generate_synthetic_data
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 REACT_BUILD_DIR = os.path.join(BASE_DIR, "dist")
