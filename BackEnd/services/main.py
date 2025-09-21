@@ -334,15 +334,15 @@ def health():
     return {"status": "ok", "message": "CityPulse API is live 🚀"} 
 
 # -- System endpoints (traffic, electricity, water, air, complaints) --
-@app.route("/traffic", methods=["GET"])
+@app.route("/api/traffic", methods=["GET"])
 def get_traffic():
     return jsonify(fetch_traffic())
 
-@app.route("/electricity", methods=["GET"])
+@app.route("/api/electricity", methods=["GET"])
 def get_electricity_load():
     return jsonify(fetch_electricity())
 
-@app.route("/electricity/forecast", methods=["GET"])
+@app.route("/api/electricity/forecast", methods=["GET"])
 def get_forecast():
     # Generate synthetic data then run forecasting service
     df = generate_synthetic_data(hours=24 * 60)  # example: minute-level for 24h
@@ -360,22 +360,22 @@ def get_forecast():
         ]
     })
 
-@app.route("/water", methods=["GET"])
+@app.route("/api/water", methods=["GET"])
 def get_water_usage():
     return jsonify(fetch_water())
 
-@app.route("/complaints", methods=["GET"])
+@app.route("/api/complaints", methods=["GET"])
 def get_complaints():
     return jsonify(fetch_complaints())
 
-@app.route("/air", methods=["GET"])
+@app.route("/api/air", methods=["GET"])
 def get_air_quality():
     lat = request.args.get("lat", 28.6139)
     lon = request.args.get("lon", 77.2090)
     return jsonify(fetch_air(lat, lon))
 
 # ----------------- Zones endpoint -----------------
-@app.route("/zones", methods=["GET"])
+@app.route("/api/zones", methods=["GET"])
 def get_all_zones():
     zones_from_db = Zone.query.all()
     zone_data = []
