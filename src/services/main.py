@@ -5,7 +5,7 @@ from collections import Counter
 
 import pandas as pd
 import requests
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 from apscheduler.schedulers.background import BackgroundScheduler
 from dotenv import load_dotenv
@@ -331,7 +331,18 @@ def check_for_alerts():
 # ----------------- Health Check -----------------
 @app.route("/api/health")
 def health():
-    return {"status": "ok", "message": "CityPulse API is live 🚀"}
+    return {"status": "ok", "message": "CityPulse API is live 🚀"} 
+
+@app.route("/", defaults={"path": ""})
+@app.route("/<path:path>")
+def serve_react(path):
+    """
+    Serve React build files from /build directory.
+    """
+    if path != "" and os.path.exists(os.path.join(REACT_BUILD_DIR, path)):
+        return send_from_directory(REACT_BUILD_DIR, path)
+    else:
+        return send_from_directory(REACT_BUILD_DIR, "index.html")
 
 # -- System endpoints (traffic, electricity, water, air, complaints) --
 @app.route("/traffic", methods=["GET"])
