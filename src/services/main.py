@@ -326,6 +326,9 @@ def check_for_alerts():
 
 
 # ----------------- Flask Endpoints -----------------
+@app.route("/")
+def health():
+    return {"status": "ok", "message": "CityPulse is live 🚀"}
 
 # -- System endpoints (traffic, electricity, water, air, complaints) --
 @app.route("/traffic", methods=["GET"])
