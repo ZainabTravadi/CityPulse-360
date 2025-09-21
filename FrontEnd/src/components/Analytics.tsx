@@ -10,6 +10,7 @@ import {
   Tooltip,
   CartesianGrid,
 } from "recharts";
+import { API_BASE } from '@/lib/api';
 
 const Analytics = () => {
   const [forecastData, setForecastData] = useState<any[]>([]);
@@ -17,7 +18,6 @@ const Analytics = () => {
   const [stats, setStats] = useState<any>({});
   const [confidence, setConfidence] = useState<number>(0);
 
-  const API_BASE = import.meta.env.VITE_API_BASE || "";
 
   useEffect(() => {
     const fetchForecast = async () => {

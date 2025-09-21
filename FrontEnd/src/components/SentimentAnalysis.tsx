@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Smile, Meh, Frown, Calendar } from "lucide-react";
+import { API_BASE } from '@/lib/api';
 
 const SentimentAnalysis = () => {
   const [sentimentData, setSentimentData] = useState({ positive: 0, neutral: 0, negative: 0, total: 0 });
@@ -12,7 +13,7 @@ const SentimentAnalysis = () => {
   const [sampleComplaints, setSampleComplaints] = useState<any[]>([]);
   const [timeRange, setTimeRange] = useState<number>(30);
 
-  const API_BASE = import.meta.env.VITE_API_BASE || "";
+
 
   useEffect(() => {
     const fetchData = async (days: number) => {

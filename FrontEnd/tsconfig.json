@@ -1,19 +1,29 @@
 {
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ],
   "compilerOptions": {
+    // Add these modern module settings
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    
+
+    // Previous fixes
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
     },
-    "noImplicitAny": false,
-    "noUnusedParameters": false,
-    "skipLibCheck": true,
+    "types": ["vite/client"],
+    
+    // Your other settings
     "allowJs": true,
-    "noUnusedLocals": false,
-    "strictNullChecks": false
-  }
+    "skipLibCheck": true,
+    "strict": true, // It's good practice to enable strict mode
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ]
 }

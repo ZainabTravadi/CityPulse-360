@@ -2,11 +2,11 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import KPICard from "./KPICard";
 import { Car, Wind, Droplets, Zap, MessageSquare } from "lucide-react";
+import { API_BASE } from '@/lib/api';
 
 const Dashboard = () => {
   const [kpiData, setKpiData] = useState<any[]>([]);
 
-  const API_BASE = import.meta.env.VITE_API_BASE || "";
 
   useEffect(() => {
     const fetchData = async () => {

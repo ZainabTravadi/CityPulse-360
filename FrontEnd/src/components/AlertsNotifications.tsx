@@ -27,6 +27,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Separator } from "@/components/ui/separator";
+import { API_BASE } from '@/lib/api';
 
 const AlertsNotifications = () => {
   const [alerts, setAlerts] = useState<any[]>([]);
@@ -34,7 +35,6 @@ const AlertsNotifications = () => {
   const [selectedFilter, setSelectedFilter] = useState("all");
   const [selectedAlert, setSelectedAlert] = useState<any | null>(null);
 
-  const API_BASE = import.meta.env.VITE_API_BASE || "";
 
   useEffect(() => {
     const fetchAlerts = async () => {

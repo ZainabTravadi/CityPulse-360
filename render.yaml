@@ -1,22 +1,29 @@
+# render.yaml
+# Defines the database and backend web service
+
+databases:
+  - name: citypulse-db
+    plan: free
+
 services:
   - type: web
-    name: citypulse-360
+    name: Citypulse-360-BackEnd
+    plan: free
     env: python
-    buildCommand: |
-      pip install -r requirements.txt
-      npm install
-      npm run build
-    startCommand: gunicorn src.services.main:app --bind 0.0.0.0:$PORT
+    pythonVersion: "3.11.9"
+    
+    # Run commands from the BackEnd folder
+    rootDir: BackEnd
+    
+    # Build and Start commands
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn BackEnd.services.main:app"
+    
+    # Environment variables
     envVars:
       - key: DATABASE_URL
-        sync: false   # you already set it in dashboard
-      - key: ELECTRICITY_API_KEY
-        sync: false
-      - key: ELECTRICITY_URL
-        sync: false
-      - key: OWM_KEY
-        sync: false
-      - key: TRAFFIC_API_KEY
-        sync: false
-      - key: PYTHON_VERSION
-        value: 3.11.9
+        fromDatabase:
+          name: citypulse-db
+          property: internalUrl
+      # For security, add your other API keys (OWM_KEY, etc.)
+      # directly in the Render dashboard's Environment tab after deploying.

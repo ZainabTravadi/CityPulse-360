@@ -15,6 +15,7 @@ import {
   CheckCircle2,
   AlertTriangle,
 } from "lucide-react";
+import { API_BASE } from '@/lib/api';
 
 const ZonesClustering = () => {
   const [zones, setZones] = useState<any[]>([]);
@@ -22,7 +23,6 @@ const ZonesClustering = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const API_BASE = import.meta.env.VITE_API_BASE || "";
 
   useEffect(() => {
     const fetchZoneData = async () => {
