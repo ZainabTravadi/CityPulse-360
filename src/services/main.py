@@ -17,12 +17,14 @@ load_dotenv()
 from src.model.models import db, Zone, TrafficData, ElectricityData, WaterData, ComplaintData, AirQualityData, Alert
 from src.services.forecasting_service import build_forecast, generate_synthetic_data
 
-app = Flask(__name__)
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+REACT_BUILD_DIR = os.path.join(BASE_DIR, "..", "build")
+
+app = Flask(__name__, static_folder=REACT_BUILD_DIR, static_url_path="/")
 CORS(app)
 
 db_url = os.getenv("DATABASE_URL", "sqlite:///citypulse.db")
-# SQLAlchemy/psycopg2 expects 'postgresql://' not 'postgres://'
-if db_url.startswith("postgres://"):
+if db_url.startswith("postgres://"):  # fix for psycopg2
     db_url = db_url.replace("postgres://", "postgresql://", 1)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = db_url
@@ -326,9 +328,10 @@ def check_for_alerts():
 
 
 # ----------------- Flask Endpoints -----------------
-@app.route("/")
+# ----------------- Health Check -----------------
+@app.route("/api/health")
 def health():
-    return {"status": "ok", "message": "CityPulse is live 🚀"}
+    return {"status": "ok", "message": "CityPulse API is live 🚀"}
 
 # -- System endpoints (traffic, electricity, water, air, complaints) --
 @app.route("/traffic", methods=["GET"])

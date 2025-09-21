@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: citypulse-360
+    env: python
+    buildCommand: |
+      pip install -r requirements.txt
+      npm install
+      npm run build
+    startCommand: gunicorn src.services.main:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: DATABASE_URL
+        sync: false   # you already set it in dashboard
+      - key: ELECTRICITY_API_KEY
+        sync: false
+      - key: ELECTRICITY_URL
+        sync: false
+      - key: OWM_KEY
+        sync: false
+      - key: TRAFFIC_API_KEY
+        sync: false
+      - key: PYTHON_VERSION
+        value: 3.11.9
